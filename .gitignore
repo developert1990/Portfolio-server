@@ -1,2 +1,4 @@
 /node_modules
 .env
+data.js
+node_es6_setup.txt
