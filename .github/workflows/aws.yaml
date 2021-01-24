@@ -1,0 +1,52 @@
+name: Deplying to EC2 instance
+
+on:
+  workflow_dispatch:
+    inputs:
+      gitSha:
+        description: 'docker image tag'
+        required: true
+      containerName:
+        description: 'docker container name'
+        required: true
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checking out repository code
+        uses: actions/checkout@v2 # git clone 하는 action 예를 들어서 npm 에서 install 하는거랑 비슷
+
+      - name: Setting up SSH
+      # 26번째줄 - SSH_KEY를 받아와서 .ssh 디렉토리 아래에 ec2.key 에 넣어줫다. 이 키(public key)는 ssh ec2 server에 저장해서 이곳으로 접속을 시도하는 내 로컬의 키(private key)와 비교를해서 퍼즐과같이 맞아떨어지면 접속을 허용하게 된다. 
+      # 27번째줄 - 해당 ec2.key 파일의 권한을 600으로 주었다. 그래야 읽을 수가 있다 고 한다.
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/ec2.key
+          chmod 600 ~/.ssh/ec2.key
+          cat >> ~/.ssh/config << END
+          Host aws
+            Hostname $SSH_HOST
+            user ubuntu
+            IdentityFile ~/.ssh/ec2.key
+            StrictHostKeyChecking no
+          END
+          cat ~/.ssh/config
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }} # 이건  local에 있는 aws_ec2_sangmean.pem 파일의 안에 내용값이다. 아마존ec2에서 받은 private ssh 키 값
+          SSH_HOST: ${{ secrets.SSH_HOST }} # ec2에 public PIv4 address 이다.
+
+      - name: Log into ec2 and deploy
+          # git ubuntu 에 환경변수를 직접 박는거 ec2 로 넘겨줄 환경변수를 선언한다.
+          # ssh aws 다음 env 
+          # 도커 컨테이너를 실행 시켜줄때 컨테이너에 환경변수 NODE_ENV 를 설정 함으로 써 해당 코드의 NODE_ENV 를 production으로 바꿔서 배포용으로 설정 해주었다.
+        run: |
+          export IMAGE_NAME=$IMAGE:${{ github.event.inputs.gitSha }}
+          export CONTAINER_NAME=${{github.event.inputs.containerName}}
+          ssh aws docker run -e NODE_ENV=production --name $CONTAINER_NAME -d -p 7777:7777 $IMAGE_NAME
+        env:
+          IMAGE: magicq6265/Portfolio-server
+          # 여기 설정한 IMAGE는 git에 secrets로 저장되어있는데 해당 value는 결국 docker hub에서 복붙해도 되지만 Makefile에 IMAGE := ${DOCKER_USERNAME}/${APP_NAME}:${GIT_SHA}  이거와같다(: 이부분왼쪽)
+
+          # git commit --allow-empty 아무것도 add 한거 없이 그냥 commit push 하고 싶을 때 사용 할 수 있는 명령어
