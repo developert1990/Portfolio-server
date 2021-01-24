@@ -1,8 +1,7 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
-import { userData, skills } from '../data';
 import User from '../models/userModel';
-import { generateToken, isAdmin } from '../utils';
+import { generateToken } from '../utils';
 import messages from '../messages';
 import bcrypt from 'bcrypt';
 import cookie from 'cookie';

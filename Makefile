@@ -1,5 +1,5 @@
 DOCKER_USERNAME := magicq6265
-APP_NAME := portfolio-hong
+APP_NAME := portfolio-server
 GIT_SHA := $(shell git rev-parse --short HEAD)
 IMAGE := ${DOCKER_USERNAME}/${APP_NAME}:${GIT_SHA}
 

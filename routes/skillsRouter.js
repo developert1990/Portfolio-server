@@ -1,9 +1,7 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Skills from '../models/skillsModel';
-import { isAdmin } from '../utils';
 import multer from 'multer';
-// import { skills } from '../data';
 
 const skillsRouter = express.Router();
 
