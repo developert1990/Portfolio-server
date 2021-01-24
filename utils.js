@@ -16,3 +16,5 @@ export const generateToken = async (user) => {
         expiresIn: '1h',
     })
 };
+export const IS_PROD = process.env.NODE_ENV === "production"
+export const getCookieDomain = () => IS_PROD ? process.env.COOKIE_DOMAIN_PROD : "localhost";

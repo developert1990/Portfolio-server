@@ -6,6 +6,7 @@ import { generateToken, isAdmin } from '../utils';
 import messages from '../messages';
 import bcrypt from 'bcrypt';
 import cookie from 'cookie';
+import { getCookieDomain } from '../utils';
 
 
 const userRouter = express.Router();
@@ -36,7 +37,7 @@ userRouter.post('/signin', expressAsyncHandler(async (req, res) => {
         res.cookie("portfolio_acc", token, {
             maxAge: 1000 * 60 * 60,
             httpOnly: true,
-            domain: "localhost",
+            domain: getCookieDomain(),
         });
         res.send({
             email: user.email,
