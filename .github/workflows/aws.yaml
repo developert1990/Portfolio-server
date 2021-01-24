@@ -46,7 +46,7 @@ jobs:
           export CONTAINER_NAME=${{github.event.inputs.containerName}}
           ssh aws docker run -e NODE_ENV=production --name $CONTAINER_NAME -d -p 7777:7777 $IMAGE_NAME
         env:
-          IMAGE: magicq6265/Portfolio-server
+          IMAGE: magicq6265/portfolio-server
           # 여기 설정한 IMAGE는 git에 secrets로 저장되어있는데 해당 value는 결국 docker hub에서 복붙해도 되지만 Makefile에 IMAGE := ${DOCKER_USERNAME}/${APP_NAME}:${GIT_SHA}  이거와같다(: 이부분왼쪽)
 
           # git commit --allow-empty 아무것도 add 한거 없이 그냥 commit push 하고 싶을 때 사용 할 수 있는 명령어
